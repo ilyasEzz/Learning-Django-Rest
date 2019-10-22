@@ -1,9 +1,12 @@
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.viewsets import ViewSet
+from rest_framework.viewsets import ViewSet, ModelViewSet
 from rest_framework.response import Response
+from rest_framework.authentication import TokenAuthentication
 
-from .serializers import HelloSerializer
+from .serializers import HelloSerializer, UserProfileSerializer
+from .models import UserProfile
+from .permissions import UpdateOwnProfile
 
 
 # class HelloApiView(APIView):
@@ -55,51 +58,61 @@ from .serializers import HelloSerializer
 #         return Response({'method': 'DELETE'})
 
 
-class HelloViewSet(ViewSet):
-    """ Test Api View Set """
+# class HelloViewSet(ViewSet):
+#     """ Test Api View Set """
 
-    serializer_class = HelloSerializer
+#     serializer_class = HelloSerializer
 
-    def list(self, request):
-        api_viewset = [
-            'Uses actions (list, create, retrieve, update, partial_update)',
-            'Automaticly maps to URLS, USING Routers',
-            'add more functionnality for less code'
-        ]
+#     def list(self, request):
+#         api_viewset = [
+#             'Uses actions (list, create, retrieve, update, partial_update)',
+#             'Automaticly maps to URLS, USING Routers',
+#             'add more functionnality for less code'
+#         ]
 
-        context = {
-            'message': 'Hello Universe',
-            'api_viewset': api_viewset
-        }
+#         context = {
+#             'message': 'Hello Universe',
+#             'api_viewset': api_viewset
+#         }
 
-        return Response(context)
+#         return Response(context)
 
-    def create(self, request):
-        """ Create a new hello message """
-        serializer = self.serializer_class(data=request.data)
+#     def create(self, request):
+#         """ Create a new hello message """
+#         serializer = self.serializer_class(data=request.data)
 
-        if serializer.is_valid():
-            name = serializer.validated_data.get('name')
-            message = f'Hello {name}'
-            return Response({'message': message})
-        else:
-            return Response(
-                serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST
-            )
+#         if serializer.is_valid():
+#             name = serializer.validated_data.get('name')
+#             message = f'Hello {name}'
+#             return Response({'message': message})
+#         else:
+#             return Response(
+#                 serializer.errors,
+#                 status=status.HTTP_400_BAD_REQUEST
+#             )
 
-    def retrieve(self, request, pk=None):
-        """ Getting an object by his primary key """
-        return Response({'http_method': 'GET'})
+#     def retrieve(self, request, pk=None):
+#         """ Getting an object by his primary key """
+#         return Response({'http_method': 'GET'})
 
-    def update(self, request, pk=None):
-        """ Updating an object by his primary key """
-        return Response({'http_method': 'PUT'})
+#     def update(self, request, pk=None):
+#         """ Updating an object by his primary key """
+#         return Response({'http_method': 'PUT'})
 
-    def partial_update(self, request, pk=None):
-        """ Upddating partially an object by his primary key """
-        return Response({'http_method': 'POST'})
+#     def partial_update(self, request, pk=None):
+#         """ Upddating partially an object by his primary key """
+#         return Response({'http_method': 'POST'})
 
-    def destroy(self, request, pk=None):
-        """ Removing an object by his primary key """
-        return Response({'http_method': 'DELETE'})
+#     def destroy(self, request, pk=None):
+#         """ Removing an object by his primary key """
+#         return Response({'http_method': 'DELETE'})
+
+
+class UserProfileViewSet(ModelViewSet):
+    """ Creating and  updating profiles """
+
+    queryset = UserProfile.objects.all()
+
+    serializer_class = UserProfileSerializer
+    authentication_classes = (TokenAuthentication, )
+    permission_classes = (UpdateOwnProfile,)
