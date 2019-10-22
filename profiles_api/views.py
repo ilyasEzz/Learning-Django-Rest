@@ -4,6 +4,9 @@ from rest_framework.viewsets import ViewSet, ModelViewSet
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.filters import SearchFilter
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.settings import api_settings
+
 
 from .serializers import HelloSerializer, UserProfileSerializer
 from .models import UserProfile
@@ -120,3 +123,10 @@ class UserProfileViewSet(ModelViewSet):
 
     filter_backends = (SearchFilter, )
     search_fields = ('login', 'name')
+
+
+class LoginApiView(ObtainAuthToken):
+    """ Creating user authentication tokens """
+    # renderer_classess enable the 'View' in the django admin
+    # 'ViewSets' has it by default but not 'ObtainAuthToken'
+    renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
